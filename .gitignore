@@ -1,0 +1,17 @@
+# Go files
+*.exe
+*.out
+*.test
+
+# IDE/editor settings
+.vscode/
+.idea/
+
+# Dependencies
+vendor/
+
+# OS files
+.DS_Store
+
+# Environment/config
+.env
