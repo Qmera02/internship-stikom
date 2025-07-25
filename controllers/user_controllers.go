@@ -36,10 +36,7 @@ func Register(c *gin.Context) {
 var jwtKey = []byte(os.Getenv("JWT_SECRET"))
 
 func Login(c *gin.Context) {
-	var input struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var input models.User
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
