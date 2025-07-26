@@ -13,7 +13,7 @@ func SetupRouter() *gin.Engine {
 	r.POST("/login", controllers.Login)
 	protected := r.Group("/api")
 	protected.Use(middlewares.JWTAuthMiddleware())
-	// protected.GET("/profile",controllers.GetProfile)
-	// protected.POST("/project",controllers.CreateProject)
+	protected.GET("/profile", controllers.GetProfile)
+	protected.POST("/project", controllers.CreateProject)
 	return r
 }
