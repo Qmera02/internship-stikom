@@ -33,8 +33,6 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "user registered"})
 }
 
-var jwtKey = []byte(os.Getenv("JWT_SECRET"))
-
 func Login(c *gin.Context) {
 	var input models.User
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -53,9 +51,11 @@ func Login(c *gin.Context) {
 		return
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"UserID": user.ID,
-		"exp":    time.Now().Add(time.Hour * 24).Unix(),
+		"user_id": user.ID,
+		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
+	jwtKey := []byte(os.Getenv("JWT_SECRET"))
+	fmt.Println("JWT_SECRET in login:", os.Getenv("JWT_SECRET"))
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "token creation failed"})

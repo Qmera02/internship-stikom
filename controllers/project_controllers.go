@@ -9,7 +9,7 @@ import (
 )
 
 func CreateProject(c *gin.Context) {
-	userID := uint(c.MustGet("UserID").(float64)) // karena MapClaims return float64
+	userID := c.MustGet("user_id").(uint) // karena MapClaims return float64
 
 	var project models.Project
 	if err := c.ShouldBindJSON(&project); err != nil {
@@ -27,7 +27,7 @@ func CreateProject(c *gin.Context) {
 	})
 }
 func GetProjects(c *gin.Context) {
-	userID := uint(c.MustGet("UserID").(float64)) // karena MapClaims return float64
+	userID := c.MustGet("user_id").(uint)
 	var projects []models.Project
 
 	if err := config.DB.Where("user_id = ?", userID).Find(&projects).Error; err != nil {
