@@ -53,8 +53,8 @@ func Login(c *gin.Context) {
 		return
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"user_id": user.ID,
-		"exp":     time.Now().Add(time.Hour * 24).Unix(),
+		"UserID": user.ID,
+		"exp":    time.Now().Add(time.Hour * 24).Unix(),
 	})
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
@@ -64,41 +64,5 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login Succesfull",
 		"token":   tokenString,
-	})
-}
-func GetProfile(c *gin.Context) {
-	userID, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "User ID not found"})
-		return
-	}
-
-	var user models.User
-	if err := config.DB.First(&user, userID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"id":    user.ID,
-		"name":  user.Name,
-		"email": user.Email,
-	})
-}
-func CreateProject(c *gin.Context) {
-	type ProjectRequest struct {
-		Title       string `json:"title" binding:"required"`
-		Description string `json:"description"`
-	}
-
-	var req ProjectRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
-		return
-	}
-
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "Project created successfully",
-		"data":    req,
 	})
 }

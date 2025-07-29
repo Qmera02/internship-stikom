@@ -1,11 +1,10 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
-	"strings"
-
-	// "time"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
@@ -13,29 +12,33 @@ import (
 
 func JWTAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := c.GetHeader("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer") {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token not provided"})
+		tokenString := c.GetHeader("Authorization")
+		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Authorization header missing or invalid"})
 			return
 		}
-		tokenString := strings.TrimPrefix(authHeader, "Bearer")
+
+		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
+
+		secret := os.Getenv("JWT_SECRET")
+		fmt.Println("DEBUG: JWT_SECRET =", secret) // <--- debug
+		if secret == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "JWT_SECRET is not set"})
+			return
+		}
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, jwt.NewValidationError("unexpected signing method", jwt.ValidationErrorSignatureInvalid)
+				return nil, fmt.Errorf("Unexpected signing method")
 			}
-			return []byte(os.Getenv("JWT_SECRET")), nil
+			return []byte(secret), nil
 		})
+
 		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			return
 		}
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok || !token.Valid || claims["exp"] == nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid claims"})
-			return
-		}
-		c.Set("UserID", claims["user_id"])
+
 		c.Next()
 	}
 }
