@@ -22,9 +22,11 @@ func GetProfile(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"id":    user.ID,
-		"name":  user.Name,
-		"email": user.Email,
+		"id":              user.ID,
+		"user_name":       user.Name,
+		"email":           user.Email,
+		"profile_name":    user.Profile.Nama,
+		"profile_address": user.Profile.Alamat,
 	})
 }
 

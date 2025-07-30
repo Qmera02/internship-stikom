@@ -55,7 +55,7 @@ func Login(c *gin.Context) {
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
 	jwtKey := []byte(os.Getenv("JWT_SECRET"))
-	fmt.Println("JWT_SECRET in login:", os.Getenv("JWT_SECRET"))
+
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "token creation failed"})

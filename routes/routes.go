@@ -18,6 +18,8 @@ func SetupRouter() *gin.Engine {
 		protected.GET("/profile", controllers.GetProfile)
 		protected.POST("/project", controllers.CreateProject)
 		protected.GET("/project", controllers.GetProjects)
+		protected.POST("/internship", controllers.CreateInternship)
+		protected.GET("/internship", controllers.GetInternships)
 	}
 
 	return r
