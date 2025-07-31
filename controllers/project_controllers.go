@@ -9,7 +9,7 @@ import (
 )
 
 func CreateProject(c *gin.Context) {
-	userID := c.MustGet("user_id").(uint) // karena MapClaims return float64
+	userID := c.MustGet("user_id").(uint)
 
 	var project models.Project
 	if err := c.ShouldBindJSON(&project); err != nil {

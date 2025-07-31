@@ -24,9 +24,11 @@ func CreateInternship(c *gin.Context) {
 }
 func GetInternships(c *gin.Context) {
 	UserID := c.MustGet("user_id").(uint)
-	var internships []models.Internship
-	if err := config.DB.Where("user_id = ?", UserID).Find(&internships).Error; err != nil {
+	var internship []models.Internship
+	if err := config.DB.Where("user_id = ?", UserID).Find(&internship).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to retrieve internships"})
 		return
 	}
+
+	c.JSON(http.StatusOK, gin.H{"internships": internship})
 }
