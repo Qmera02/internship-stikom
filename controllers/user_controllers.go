@@ -41,7 +41,7 @@ func Login(c *gin.Context) {
 	}
 
 	var user models.User
-	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
+	if err := config.DB.Where("name = ?", input.Name).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
@@ -52,6 +52,7 @@ func Login(c *gin.Context) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
+		"role":    user.Role,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
 	jwtKey := []byte(os.Getenv("JWT_SECRET"))
@@ -64,5 +65,10 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login Succesfull",
 		"token":   tokenString,
+		"user": gin.H{
+			"id":   user.ID,
+			"name": user.Name,
+			"Role": user.Role,
+		},
 	})
 }

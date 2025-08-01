@@ -45,8 +45,24 @@ func JWTAuthMiddleware() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid user_id in token"})
 			return
 		}
-
+		role, ok := claims["role"].(string)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid role in token"})
+			return
+		}
 		c.Set("user_id", uint(userIDFloat))
+		c.Set("role", role)
+		c.Next()
+	}
+}
+func RequireRole(role string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole, exists := c.Get("role")
+		if !exists || userRole != role {
+			c.JSON(http.StatusForbidden, gin.H{"error": "access denied: role not allowed"})
+			c.Abort()
+			return
+		}
 		c.Next()
 	}
 }
